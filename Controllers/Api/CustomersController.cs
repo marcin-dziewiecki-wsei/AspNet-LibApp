@@ -2,19 +2,11 @@
 using LibApp.Data;
 using LibApp.Dtos;
 using LibApp.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
-using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
-using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
-using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
-using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
-using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace LibApp.Controllers.Api
 {
@@ -22,6 +14,9 @@ namespace LibApp.Controllers.Api
     [ApiController]
     public class CustomersController : ControllerBase
     {
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+
         public CustomersController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
@@ -30,18 +25,18 @@ namespace LibApp.Controllers.Api
 
         // GET /api/customers
         [HttpGet]
-        public IActionResult GetCustomers(string query = null)
+        public async Task<IActionResult> GetCustomers(string query = null)
         {
-            IEnumerable<Customer> customersQuery = _context.Customers
+            IQueryable<Customer> customersQuery = _context.Customers
                 .Include(c => c.MembershipType);
 
-            if (!String.IsNullOrWhiteSpace(query))
+            if (!string.IsNullOrWhiteSpace(query))
             {
                 customersQuery = customersQuery.Where(c => c.Name.Contains(query));
             }
 
-            var customerDtos = customersQuery
-                .ToList()
+            var customerDtos = (await customersQuery
+                .ToListAsync())
                 .Select(_mapper.Map<Customer, CustomerDto>);
 
             return Ok(customerDtos);
@@ -57,7 +52,7 @@ namespace LibApp.Controllers.Api
             await Task.Delay(2000);
             if (customer == null)
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             Console.WriteLine("Request end");
@@ -67,56 +62,55 @@ namespace LibApp.Controllers.Api
 
         // POST /api/customers/
         [HttpPost]
-        public CustomerDto CreateCustomer(CustomerDto customerDto)
+        public async Task<IActionResult> CreateCustomer(CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var customer = _mapper.Map<Customer>(customerDto);
             _context.Customers.Add(customer);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             customerDto.Id = customer.Id;
 
-            return customerDto;
+            return Ok(customerDto);
         }
 
         // PUT api/customers/{id}
         [HttpPut("{id}")]
-        public void UpdateCustomer(int id, CustomerDto customerDto)
+        public async Task<IActionResult> UpdateCustomer(int id, CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == customerDto.Id);
             if (customerInDb == null)
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+                return NotFound();
             }
 
 
             _mapper.Map(customerDto, customerInDb);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // DELETE /api/customers
         [HttpDelete("{id}")]
-        public void DeleteCusomer(int id)
+        public async Task<IActionResult> DeleteCusomer(int id)
         {
-            var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == id);
+            var customerInDb = await _context.Customers.SingleOrDefaultAsync(c => c.Id == id);
             if (customerInDb == null)
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             _context.Customers.Remove(customerInDb);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return Ok();
         }
-
-        private ApplicationDbContext _context;
-        private readonly IMapper _mapper;
     }
 }
