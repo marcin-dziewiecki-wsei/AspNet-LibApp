@@ -8,15 +8,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using LibApp.Models;
 using Microsoft.Extensions.DependencyInjection;
+using LibApp.Data;
 
 namespace LibApp
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-            
+
+            await host.UseDatabaseAutoMigration();
+
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
