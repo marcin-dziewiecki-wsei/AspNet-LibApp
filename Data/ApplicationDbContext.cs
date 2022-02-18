@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using LibApp.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using LibApp.Models;
 
 namespace LibApp.Data
 {
@@ -18,6 +15,14 @@ namespace LibApp.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<MembershipType>().Property(x => x.Id).UseIdentityColumn();
+            builder.Entity<Genre>().Property(x => x.Id).UseIdentityColumn();
+
+            base.OnModelCreating(builder);
         }
     }
 }
