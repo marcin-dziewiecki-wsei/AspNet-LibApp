@@ -1,20 +1,19 @@
-﻿using LibApp.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace LibApp.Data
 {
-    public static class DbInitializer
+    public static partial class DbInitializer
     {
         public static async Task<IHost> UseDatabaseAutoMigration(this IHost app)
         {
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                var isNewDatabase = context.Database.CanConnect() == false;
                 await context.Database.MigrateAsync();
             }
             return app;
@@ -25,50 +24,14 @@ namespace LibApp.Data
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                await SeedMembershipTypes(context);
+
+                var membershipTypes = await SeedMembershipTypes(context);
+                var genres = await SeedGenres(context);                
+                var books = await SeedBooks(context, genres);
+                var customers = await SeedCustomers(context, membershipTypes);
+                var rentals = await SeedRentals(context, books, customers);
             }
             return app;
-        }
-
-        private static async Task SeedMembershipTypes(ApplicationDbContext context)
-        {
-            if (context.MembershipTypes.Any())
-            {
-                Console.WriteLine("MembershipTypes already seeded");
-                return;
-            }
-
-            context.MembershipTypes.AddRange(
-                new MembershipType
-                {
-                    Id = 1,
-                    SignUpFee = 0,
-                    DurationInMonths = 0,
-                    DiscountRate = 0
-                },
-                new MembershipType
-                {
-                    Id = 2,
-                    SignUpFee = 30,
-                    DurationInMonths = 1,
-                    DiscountRate = 10
-                },
-                new MembershipType
-                {
-                    Id = 3,
-                    SignUpFee = 90,
-                    DurationInMonths = 3,
-                    DiscountRate = 15
-                },
-                new MembershipType
-                {
-                    Id = 4,
-                    SignUpFee = 300,
-                    DurationInMonths = 12,
-                    DiscountRate = 20
-                });
-
-            await context.SaveChangesAsync();
-        }
+        }       
     }
 }
