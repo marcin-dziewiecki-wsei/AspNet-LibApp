@@ -24,7 +24,7 @@ namespace LibApp.Data.Data
                 {
                     Name = "Barbara Chmielewska",
                     Birthdate = System.DateTime.Now.AddYears(-19).AddMonths(-1).AddDays(-27),
-                    HasNewsletterSubscribed = true,
+                    HasNewsletterSubscribed = false,
                     MembershipType = membershipTypes.TakeAtIndexOrLast(1),
                 },
                 new Customer
@@ -38,12 +38,12 @@ namespace LibApp.Data.Data
                 {
                     Name = "Magdalena Laskowska",
                     Birthdate = System.DateTime.Now.AddYears(-26).AddMonths(-3).AddDays(-3),
-                    HasNewsletterSubscribed = true,
+                    HasNewsletterSubscribed = false,
                     MembershipType = membershipTypes.TakeAtIndexOrLast(3),
                 },
                 new Customer
                 {
-                    Name = "Józef Mróz",
+                    Name = "Józef Kowalski",
                     Birthdate = System.DateTime.Now.AddYears(-43).AddMonths(-2).AddDays(-15),
                     HasNewsletterSubscribed = true,
                     MembershipType = membershipTypes.TakeAtIndexOrLast(0),
@@ -52,7 +52,7 @@ namespace LibApp.Data.Data
                 {
                     Name = "Emil Czerwiński",
                     Birthdate = System.DateTime.Now.AddYears(-53).AddMonths(-8).AddDays(-25),
-                    HasNewsletterSubscribed = true,
+                    HasNewsletterSubscribed = false,
                     MembershipType = membershipTypes.TakeAtIndexOrLast(1),
                 }
             };
