@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
-using LibApp.Data.Data;
+using LibApp.Data.Repository.Interfaces;
 using LibApp.Domain.Dtos;
 using LibApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace LibApp.Controllers.Api
 {
@@ -13,26 +12,23 @@ namespace LibApp.Controllers.Api
     [ApiController]
     public class BooksController : ControllerBase
     {
-        public BooksController(ApplicationDbContext context, IMapper mapper)
+        private readonly IBookRepository bookRepository;
+        private readonly IMapper mapper;
+
+        public BooksController(IBookRepository bookRepository, IMapper mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            this.bookRepository = bookRepository;
+            this.mapper = mapper;
         }
         [HttpGet]
-        public IEnumerable<BookDto> GetBooks(string query = null) 
+        public async Task<IActionResult> GetBooks(string query = null) 
         {
-            var booksQuery = _context.Books
-                .Where(b => b.NumberAvailable > 0);
-
-            if (!String.IsNullOrWhiteSpace(query))
-            {
-                booksQuery = booksQuery.Where(b => b.Name.Contains(query));
-            }
-
-            return booksQuery.ToList().Select(_mapper.Map<Book, BookDto>);
+            var books = await bookRepository.GetAllAvailableBooksFilteredByNameAsync(query);
+            var response = books.Select(mapper.Map<Book, BookDto>);
+            
+            return Ok(response);
         }
 
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        
     }
 }

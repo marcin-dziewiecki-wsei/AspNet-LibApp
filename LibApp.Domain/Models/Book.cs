@@ -1,9 +1,10 @@
-﻿using System;
+﻿using LibApp.Domain.Models.Abstractions;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace LibApp.Domain.Models
 {
-    public class Book
+    public class Book: EntityBase, IEntityName, IEntityId
     {
         public int Id { get; set; }
 		[Required]

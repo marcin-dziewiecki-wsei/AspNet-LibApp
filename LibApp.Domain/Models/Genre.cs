@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LibApp.Domain.Models.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibApp.Domain.Models
 {
-    public class Genre
+    public class Genre : EntityBase, IEntityName, IEntityTinyId
     {
         public byte Id { get; set; }
         [Required]

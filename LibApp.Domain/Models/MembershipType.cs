@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LibApp.Domain.Models.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibApp.Domain.Models
 {
-    public class MembershipType
+    public class MembershipType: EntityBase, IEntityTinyId
     {
         public byte Id { get; set; }
         [Required]
@@ -12,7 +13,9 @@ namespace LibApp.Domain.Models
         public byte DurationInMonths { get; set; }
         public byte DiscountRate { get; set; }
 
-        public static byte Unknown = 0;
-        public static byte PayAsYouGo = 1;
+        public static byte Free = 1;
+        public static byte Standard = 2;
+        public static byte Silver = 3;
+        public static byte Gold = 4;
     }
 }

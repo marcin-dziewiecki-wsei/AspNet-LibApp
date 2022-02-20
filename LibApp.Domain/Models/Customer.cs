@@ -1,9 +1,10 @@
+using LibApp.Domain.Models.Abstractions;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace LibApp.Domain.Models
 {
-    public class Customer
+    public class Customer : EntityBase, IEntityName, IEntityId
     {
         public int Id { get; set; }
         [Required(ErrorMessage = "Please enter customer's name")]

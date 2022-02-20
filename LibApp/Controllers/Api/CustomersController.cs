@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using LibApp.Data.Data;
+using LibApp.Data.Repository.Interfaces;
 using LibApp.Domain.Dtos;
 using LibApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,50 +12,37 @@ namespace LibApp.Controllers.Api
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly ICustomerRepository customerRepository;
+        private readonly IMapper mapper;
 
-        public CustomersController(ApplicationDbContext context, IMapper mapper)
+        public CustomersController(ICustomerRepository customerRepository, IMapper mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            this.customerRepository = customerRepository;
+            this.mapper = mapper;
         }
 
         // GET /api/customers
         [HttpGet]
         public async Task<IActionResult> GetCustomers(string query = null)
         {
-            IQueryable<Customer> customersQuery = _context.Customers
-                .Include(c => c.MembershipType);
+            var customers = await customerRepository.GetAllFilteredByNameWithMembershipTypesAsync(query);
+            var response = customers.Select(mapper.Map<Customer, CustomerDto>);
 
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                customersQuery = customersQuery.Where(c => c.Name.Contains(query));
-            }
-
-            var customerDtos = (await customersQuery
-                .ToListAsync())
-                .Select(_mapper.Map<Customer, CustomerDto>);
-
-            return Ok(customerDtos);
+            return Ok(response);
         }
 
         // GET /api/customers/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomer(int id)
         {
-            Console.WriteLine("Request beginning");
+            var customer = await customerRepository.GetByIdAsync(id);
 
-            var customer = await _context.Customers.SingleOrDefaultAsync(c => c.Id == id);
-            await Task.Delay(2000);
-            if (customer == null)
-            {
+            if (customer is null)
                 return NotFound();
-            }
 
-            Console.WriteLine("Request end");
+            var response = mapper.Map<CustomerDto>(customer);
 
-            return Ok(_mapper.Map<CustomerDto>(customer));
+            return Ok(response);
         }
 
         // POST /api/customers/
@@ -65,14 +50,11 @@ namespace LibApp.Controllers.Api
         public async Task<IActionResult> CreateCustomer(CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest();
-            }
 
-            var customer = _mapper.Map<Customer>(customerDto);
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
-            customerDto.Id = customer.Id;
+            var customer = mapper.Map<Customer>(customerDto);
+            var response = await customerRepository.AddAsync(customer);
+            customerDto.Id = response;
 
             return Ok(customerDto);
         }
@@ -82,35 +64,24 @@ namespace LibApp.Controllers.Api
         public async Task<IActionResult> UpdateCustomer(int id, CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest();
-            }
 
-            var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == customerDto.Id);
-            if (customerInDb == null)
-            {
-                return NotFound();
-            }
+            var customer = mapper.Map<Customer>(customerDto);
 
+            if (await customerRepository.UpdateAsync(customer))
+                return Ok();
 
-            _mapper.Map(customerDto, customerInDb);
-            await _context.SaveChangesAsync();
-            return Ok();
+            return NotFound();
         }
 
         // DELETE /api/customers
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCusomer(int id)
+        public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var customerInDb = await _context.Customers.SingleOrDefaultAsync(c => c.Id == id);
-            if (customerInDb == null)
-            {
-                return NotFound();
-            }
+            if (await customerRepository.DeleteByIdAsync(id))
+                return Ok();
 
-            _context.Customers.Remove(customerInDb);
-            await _context.SaveChangesAsync();
-            return Ok();
+            return NotFound();
         }
     }
 }
