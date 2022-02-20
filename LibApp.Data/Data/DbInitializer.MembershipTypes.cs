@@ -47,7 +47,7 @@ namespace LibApp.Data.Data
                 }
             };
 
-            await collectionToAdd.AddCollection(context);
+            await collectionToAdd.AddCollection(context, identityInsert: true);
             return collectionToAdd;
         }
     }
