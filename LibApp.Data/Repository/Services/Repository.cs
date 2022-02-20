@@ -1,4 +1,5 @@
 ﻿using LibApp.Data.Data;
+using LibApp.Data.Repository.Interfaces;
 using LibApp.Domain.Models.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibApp.Data.Repository.Services
 {
-    internal abstract class Repository<T> where T : EntityBase
+    internal abstract class Repository<T> : IRepository<T> where T : EntityBase
     {
         protected readonly ApplicationDbContext context;
 
@@ -34,6 +35,12 @@ namespace LibApp.Data.Repository.Services
             await context.SaveChangesAsync();
 
             return true;
+        }
+
+        public virtual async Task AddRangeAsync(IList<T> entities)
+        {
+            await context.AddRangeAsync(entities);
+            await context.SaveChangesAsync();
         }
 
         public virtual async Task<int> AddAsync(T entity)
@@ -67,5 +74,7 @@ namespace LibApp.Data.Repository.Services
 
         protected IQueryable<M> GetAllFilteredByNameQuery<M>(string name) where M : T, IEntityName
             => GetAllQuery<M>().FilterByName(name);
+        
+        public abstract Task<bool> UpdateAsync(T entity);
     }
 }

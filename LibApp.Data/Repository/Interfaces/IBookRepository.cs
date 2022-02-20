@@ -6,6 +6,7 @@ namespace LibApp.Data.Repository.Interfaces
 {
     public interface IBookRepository: IRepository<Book>
     {
+        Task<IList<Book>> GetAllByIdsWithGenreAsync(List<int> ids);
         Task<IList<Book>> GetAllAvailableBooksFilteredByNameAsync(string name);
     }
 }

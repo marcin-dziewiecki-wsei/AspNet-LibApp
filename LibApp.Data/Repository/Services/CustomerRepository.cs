@@ -13,10 +13,13 @@ namespace LibApp.Data.Repository.Services
         {
         }
 
+        public async Task<Customer> GetByIdWithMemberTypeAsync(int id)
+            => await context.Customers.Include(x => x.MembershipType).SingleOrDefaultAsync(x => x.Id == id);
+
         public async Task<IList<Customer>> GetAllFilteredByNameWithMembershipTypesAsync(string name)
             => await GetAllFilteredByNameQuery<Customer>(name).Include(x => x.MembershipType).ToListAsync();
 
-        public async Task<bool> UpdateAsync(Customer entity)
+        public override async Task<bool> UpdateAsync(Customer entity)
         {
             if (await context.Customers.AnyAsync(x => x.Id == entity.Id))
             {

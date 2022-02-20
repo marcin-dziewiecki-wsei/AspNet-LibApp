@@ -1,10 +1,10 @@
-﻿using LibApp.Data.Data;
+﻿using LibApp.Data.Repository.Interfaces;
 using LibApp.Domain.Dtos;
 using LibApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LibApp.Controllers.Api
 {
@@ -12,21 +12,24 @@ namespace LibApp.Controllers.Api
     [ApiController]
     public class NewRentalsController : ControllerBase
     {
-        public NewRentalsController(ApplicationDbContext context)
+        private readonly IRentalRepository rentalRepository;
+        private readonly IBookRepository bookRepository;
+        private readonly ICustomerRepository customerRepository;
+
+        public NewRentalsController(IRentalRepository rentalRepository, IBookRepository bookRepository, ICustomerRepository customerRepository)
         {
-            _context = context;
+            this.rentalRepository = rentalRepository;
+            this.bookRepository = bookRepository;
+            this.customerRepository = customerRepository;
         }
 
         [HttpPost]
-        public IActionResult CreateNewRental([FromBody] NewRentalDto newRental)
+        public async Task<IActionResult> CreateNewRental([FromBody] NewRentalDto newRental)
         {
-            var customer = _context.Customers
-                .Include(c => c.MembershipType)
-                .SingleOrDefault(c => c.Id == newRental.CustomerId);
+            var customer = await customerRepository.GetByIdWithMemberTypeAsync(newRental.CustomerId);
+            var books = await bookRepository.GetAllByIdsWithGenreAsync(newRental.BookIds);
 
-            var books = _context.Books
-                .Include(b => b.Genre)
-                .Where(b => newRental.BookIds.Contains(b.Id)).ToList();
+            var rentalsToAdd = new List<Rental>();
 
             foreach (var book in books)
             {
@@ -34,20 +37,16 @@ namespace LibApp.Controllers.Api
                     return BadRequest("Book is not available");
 
                 book.NumberAvailable--;
-                var rental = new Rental()
+                rentalsToAdd.Add(new Rental()
                 {
                     Customer = customer,
                     Book = book,
                     DateRented = DateTime.Now
-                };
-
-                _context.Rentals.Add(rental);
+                });
             }
 
-            _context.SaveChanges();
+            await rentalRepository.AddRangeAsync(rentalsToAdd);
             return Ok();
         }
-
-        private readonly ApplicationDbContext _context;
     }
 }

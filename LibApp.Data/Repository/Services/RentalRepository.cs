@@ -11,7 +11,7 @@ namespace LibApp.Data.Repository.Services
         {
         }
 
-        public Task<bool> UpdateAsync(Rental entity)
+        public override Task<bool> UpdateAsync(Rental entity)
         {
             throw new System.NotImplementedException();
         }
