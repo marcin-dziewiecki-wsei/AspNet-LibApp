@@ -7,7 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibApp", "LibApp\LibApp.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibApp.Data", "LibApp.Data\LibApp.Data.csproj", "{EE489AA2-D7A7-4E14-8BD7-80357FC3545E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibApp.Domain", "LibApp.Domain\LibApp.Domain.csproj", "{52AF396D-F15D-486A-BF81-5846C40EE0B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibApp.Domain", "LibApp.Domain\LibApp.Domain.csproj", "{52AF396D-F15D-486A-BF81-5846C40EE0B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D4913C14-A10B-494A-9993-972C332ECDD0}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.txt = README.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
