@@ -47,6 +47,7 @@ namespace LibApp.Controllers.Api
 
         // POST /api/books/
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBook(NewBookDto newBookDto)
         {
             if (ModelState.IsValid == false)
@@ -63,6 +64,7 @@ namespace LibApp.Controllers.Api
 
         // PUT api/books/{id}
         [HttpPut("{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateBook(int id, UpdateBookDto updateBookDto)
         {
             updateBookDto.Id = id;
@@ -80,6 +82,7 @@ namespace LibApp.Controllers.Api
 
         // DELETE /api/books/{id}
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBook(int id)
         {
             if (await bookRepository.DeleteByIdAsync(id))

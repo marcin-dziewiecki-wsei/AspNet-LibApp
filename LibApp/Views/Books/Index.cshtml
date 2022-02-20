@@ -5,6 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
 <h2>Books</h2>
 
 <p>
@@ -72,11 +77,16 @@
                         }
                     },
                     callback: function (result) {
+                        var form = $('#__AjaxAntiForgeryForm');
+                        var token = $('input[name="__RequestVerificationToken"]', form).val();
                         console.log(token);
                         if (result) {
                             $.ajax({
                                 url: "/api/books/" + button.attr("data-book-id"),
                                 method: "DELETE",
+                                data: {
+                                    __RequestVerificationToken: token
+                                },
                                 contentType:'application/x-www-form-urlencoded; charset=utf-8',
                                 success: function () {
                                     table.row(button.parents("tr")).remove().draw();
