@@ -15,6 +15,7 @@ namespace LibApp.Data.Data
             var collectionToAdd = new List<MembershipType> {
                 new MembershipType
                 {
+                    Id = MembershipType.Free,
                     SignUpFee = 0,
                     DurationInMonths = 0,
                     DiscountRate = 0,
@@ -22,6 +23,7 @@ namespace LibApp.Data.Data
                 },
                 new MembershipType
                 {
+                    Id = MembershipType.Standard,
                     SignUpFee = 30,
                     DurationInMonths = 1,
                     DiscountRate = 10,
@@ -29,6 +31,7 @@ namespace LibApp.Data.Data
                 },
                 new MembershipType
                 {
+                    Id = MembershipType.Silver,
                     SignUpFee = 90,
                     DurationInMonths = 3,
                     DiscountRate = 15,
@@ -36,6 +39,7 @@ namespace LibApp.Data.Data
                 },
                 new MembershipType
                 {
+                    Id = MembershipType.Gold,
                     SignUpFee = 300,
                     DurationInMonths = 12,
                     DiscountRate = 20,
