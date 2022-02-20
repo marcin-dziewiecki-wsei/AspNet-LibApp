@@ -8,7 +8,7 @@ namespace LibApp.Data.Repository.Interfaces
     {
         Task<int> AddAsync(T entity);
         Task AddRangeAsync(IList<T> entities);
-        Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(int id, bool noTracking = false);
         Task<IList<T>> GetAllAsync();
         Task<bool> UpdateAsync(T entity);
         Task<bool> DeleteByIdAsync(int id);

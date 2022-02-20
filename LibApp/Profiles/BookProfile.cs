@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using LibApp.Domain.Dtos;
+using LibApp.Domain.Dtos.Book;
 using LibApp.Domain.Models;
 
 namespace LibApp.Profiles
@@ -8,8 +8,15 @@ namespace LibApp.Profiles
     {
         public BookProfile()
         {
-            CreateMap<Book, BookDto>();
-            CreateMap<BookDto, Book>();
+            CreateMap<Book, BookDto>()
+                .ForMember(x => x.Genre, z => z.MapFrom(x => x.Genre.Name));
+
+            CreateMap<Book, BookDetailsDto>()
+                .ForMember(x => x.Genre, z => z.MapFrom(x => x.Genre.Name));
+
+            CreateMap<NewBookDto, Book>();
+
+            CreateMap<UpdateBookDto, Book>();
         }
     }
 }

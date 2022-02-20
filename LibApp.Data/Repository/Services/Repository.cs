@@ -56,12 +56,17 @@ namespace LibApp.Data.Repository.Services
                 throw new InvalidOperationException();
         }
 
-        public virtual async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(int id, bool noTracking = false)
         {
+            var query = context.Set<T>().AsQueryable();
+            
+            if (noTracking)
+                query = query.AsNoTracking();
+
             if (typeof(IEntityId).IsAssignableFrom(typeof(T)))
-                return await context.Set<T>().SingleOrDefaultAsync(x => (x as IEntityId).Id == id);
+                return await query.SingleOrDefaultAsync(x => (x as IEntityId).Id == id);
             else if (typeof(IEntityTinyId).IsAssignableFrom(typeof(T)))
-                return await context.Set<T>().SingleOrDefaultAsync(x => (x as IEntityTinyId).Id == (byte)id);
+                return await query.SingleOrDefaultAsync(x => (x as IEntityTinyId).Id == (byte)id);
             else
                 throw new InvalidOperationException();
         }
