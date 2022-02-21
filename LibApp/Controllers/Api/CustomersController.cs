@@ -63,6 +63,8 @@ namespace LibApp.Controllers.Api
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCustomer(int id, CustomerDto customerDto)
         {
+            customerDto.Id = id;
+
             if (!ModelState.IsValid)
                 return BadRequest();
 

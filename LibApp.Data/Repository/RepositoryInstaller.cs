@@ -11,6 +11,7 @@ namespace LibApp.Data.Repository
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IRentalRepository, RentalRepository>();
+            services.AddScoped<IGenreRepository, GenreRepository>();
 
             return services;
         }

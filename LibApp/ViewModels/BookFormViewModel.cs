@@ -1,12 +1,13 @@
-﻿using LibApp.Domain.Models;
+﻿using LibApp.Domain.Dtos.Book;
+using LibApp.Domain.Dtos.Genre;
 using System.Collections.Generic;
 
 namespace LibApp.ViewModels
 {
     public class BookFormViewModel
     {
-        public IEnumerable<Genre> Genres { get; set; }
-        public Book Book { get; set; }
+        public IEnumerable<GenreDto> Genres { get; set; }
+        public BookDetailsDto Book { get; set; }
         public string Title
         {
             get

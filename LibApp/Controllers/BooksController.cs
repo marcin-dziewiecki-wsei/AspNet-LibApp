@@ -1,102 +1,86 @@
-﻿using LibApp.Data.Data;
-using LibApp.Domain.Models;
+﻿using AutoMapper;
+using LibApp.Domain.Dtos.Book;
+using LibApp.Services.Interfaces;
 using LibApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace LibApp.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBookService bookService;
+        private readonly IGenreService genreService;
+        private readonly IMapper mapper;
 
-        public BooksController(ApplicationDbContext contex)
+        public BooksController(IBookService bookService, IGenreService genreService, IMapper mapper)
         {
-            _context = contex;
+            this.bookService = bookService;
+            this.genreService = genreService;
+            this.mapper = mapper;
         }
 
         public IActionResult Index()
-        {
-            var books = _context.Books
-                .Include(b => b.Genre)
-                .ToList();
+            => View();
 
-            return View(books);
-        }
-
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var book = _context.Books
-                .Include(b => b.Genre)
-                .SingleOrDefault(b => b.Id == id);
+            var book = await bookService.GetBookDetails(id);
 
             if (book == null)
-            {
                 return Content("Book not found");
-            }
 
             return View(book);
         }
 
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var book = _context.Books.SingleOrDefault(b => b.Id == id);
+            var book = await bookService.GetBookDetails(id);
+            
             if (book == null)
-            {
                 return NotFound();
-            }
 
             var viewModel = new BookFormViewModel
             {
                 Book = book,
-                Genres = _context.Genre.ToList()
+                Genres = await genreService.GetAll()
             };
 
             return View("BookForm", viewModel);
         }
 
-        public IActionResult New()
+        public async Task<IActionResult> New()
         {
-            var genres = _context.Genre.ToList();
             var viewModel = new BookFormViewModel
             {
-                Genres = genres
+                Genres = await genreService.GetAll()
             };
 
             return View("BookForm", viewModel);
         }
 
-        public IActionResult Save(Book book)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Save(UpdateBookDto book)
         {
-            if (book.Id == 0)
+            if (ModelState.IsValid == false)
             {
-                book.DateAdded = DateTime.Now;
-                _context.Books.Add(book);
-            }
-            else
-            {
-                var bookInDb = _context.Books.SingleOrDefault(b => b.Id == book.Id);
-                bookInDb.Name = book.Name;
-                bookInDb.AuthorName = book.AuthorName;
-                bookInDb.ReleaseDate = book.ReleaseDate;
-                bookInDb.GenreId = book.GenreId;
-                bookInDb.NumberInStock = book.NumberInStock;
+                var viewModel = new BookFormViewModel
+                {
+                    Book = mapper.Map<BookDetailsDto>(book),
+                    Genres = await genreService.GetAll()
+                };
+
+                return View("BookForm", viewModel);
+
             }
 
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException e)
-            {
-                Console.WriteLine(e);
-            }
+            if (book.Id == 0)
+                await bookService.CreateBook(book);
+            else
+                await bookService.UpdateBook(book);
 
             return RedirectToAction("Index", "Books");
         }
-
-
     }
 }

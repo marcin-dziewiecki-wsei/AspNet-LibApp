@@ -1,5 +1,7 @@
 using LibApp.Data.Data;
 using LibApp.Data.Repository;
+using LibApp.Services;
+using LibApp.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -36,6 +38,8 @@ namespace LibApp
             services.AddControllersWithViews();
 
             services.AddRepositories();
+            services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IGenreService, GenreService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

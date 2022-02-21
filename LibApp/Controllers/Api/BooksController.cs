@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using LibApp.Data.Repository.Interfaces;
-using LibApp.Domain.Dtos.Book;
-using LibApp.Domain.Models;
+﻿using LibApp.Domain.Dtos.Book;
+using LibApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace LibApp.Controllers.Api
@@ -12,22 +9,18 @@ namespace LibApp.Controllers.Api
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly IBookRepository bookRepository;
-        private readonly IMapper mapper;
+        private readonly IBookService bookService;
 
-        public BooksController(IBookRepository bookRepository, IMapper mapper)
+        public BooksController(IBookService bookService)
         {
-            this.bookRepository = bookRepository;
-            this.mapper = mapper;
+            this.bookService = bookService;
         }
 
         // GET /api/books
         [HttpGet]
         public async Task<IActionResult> GetBooks(string query = null) 
         {
-            var books = await bookRepository.GetAllAvailableBooksWithGenreFilteredByNameAsync(query);
-            var response = books.Select(mapper.Map<Book, BookDto>);
-            
+            var response = await bookService.GetAllBooks(query);
             return Ok(response);
         }
 
@@ -35,14 +28,10 @@ namespace LibApp.Controllers.Api
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBook(int id)
         {
-            var book = await bookRepository.GetByIdWithGenreAsync(id);
+            var response = await bookService.GetBookDetails(id);
 
-            if (book is null)
-                return NotFound();
-
-            var response = mapper.Map<BookDetailsDto>(book);
-
-            return Ok(response);
+            if (response is null) return NotFound();
+            else return Ok(response);
         }
 
         // POST /api/books/
@@ -53,12 +42,7 @@ namespace LibApp.Controllers.Api
             if (ModelState.IsValid == false)
                 return BadRequest();
 
-            var book = mapper.Map<Book>(newBookDto);
-            var bookId = await bookRepository.AddAsync(book);
-
-            var savedBook = await bookRepository.GetByIdWithGenreAsync(bookId);
-            var response = mapper.Map<BookDetailsDto>(savedBook);
-
+            var response = await bookService.CreateBook(newBookDto);
             return Ok(response);
         }
 
@@ -72,9 +56,7 @@ namespace LibApp.Controllers.Api
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var book = mapper.Map<Book>(updateBookDto);
-
-            if (await bookRepository.UpdateAsync(book))
+            if (await bookService.UpdateBook(updateBookDto))
                 return Ok();
 
             return NotFound();
@@ -85,7 +67,7 @@ namespace LibApp.Controllers.Api
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            if (await bookRepository.DeleteByIdAsync(id))
+            if (await bookService.DeleteBook(id))
                 return Ok();
 
             return NotFound();
