@@ -30,6 +30,9 @@ namespace LibApp.Data.Data.Seed
                 var books = await SeedBooks(context, genres);
                 var customers = await SeedCustomers(context, membershipTypes);
                 var rentals = await SeedRentals(context, books, customers);
+
+
+                var identityRoles = await SeedIdentityRoles(scope);
             }
             return app;
         }       
