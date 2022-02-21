@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 
-namespace LibApp.Data.Data
+namespace LibApp.Data.Data.Seed
 {
     public static partial class DbInitializer
     {

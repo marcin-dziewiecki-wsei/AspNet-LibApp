@@ -1,4 +1,4 @@
-using LibApp.Data.Data;
+using LibApp.Data.Data.Seed;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
