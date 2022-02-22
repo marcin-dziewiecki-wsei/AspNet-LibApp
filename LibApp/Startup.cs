@@ -38,6 +38,13 @@ namespace LibApp
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireOwnerRole", policy => policy.RequireRole("Owner"));
+                options.AddPolicy("RequireManagerRole", policy => policy.RequireRole("Owner", "StoreManager"));
+                options.AddPolicy("RequireUserRole", policy => policy.RequireRole("Owner", "StoreManager", "User"));
+            });
+
             services.AddRepositories();
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<IGenreService, GenreService>();
