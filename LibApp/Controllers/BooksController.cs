@@ -53,7 +53,6 @@ namespace LibApp.Controllers
             return View("BookForm", viewModel);
         }
 
-        [ValidateAntiForgeryToken]
         [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> New()
         {
@@ -81,7 +80,7 @@ namespace LibApp.Controllers
 
             }
 
-            if (book.Id == 0)
+            if (book.Id.GetValueOrDefault() == 0)
                 await bookService.CreateBook(book);
             else
                 await bookService.UpdateBook(book);

@@ -12,19 +12,26 @@
 
 <h2>Books</h2>
 
-<p>
-    <a class="btn btn-primary" asp-action="New">New Book</a>
-</p>
+@if (this.User.IsInRole("StoreManager") || this.User.IsInRole("Owner"))
+{
+    <p>
+        <a class="btn btn-primary" asp-action="New">New Book</a>
+    </p>
+}
 
 <table id="books" class="table table-hover">
     <thead>
     <tr>
         <th>Title</th>
         <th>Genre</th>
-        <th>Delete</th>
+            @if (this.User.IsInRole("StoreManager") || this.User.IsInRole("Owner"))
+            {
+                <th>Delete</th>
+            }
     </tr>
     </thead>
     <tbody>
+
     </tbody>
 </table>
 
@@ -49,6 +56,7 @@
                     },
                     {
                         data: "id",
+                        visible: @((this.User.IsInRole("StoreManager") || this.User.IsInRole("Owner")).ToString().ToLowerInvariant()),
                         render: function (data) {
                             return "<button class='btn btn-secondary js-delete' data-book-id=" + data + ">Delete</button>";
                         }
@@ -61,6 +69,8 @@
     <script>
         $(document).ready(function () {
             var table = $("#books").DataTable();
+
+            
 
             $("#books").on("click", ".js-delete", function () {
                 var button = $(this);
