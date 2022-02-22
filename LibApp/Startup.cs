@@ -43,6 +43,7 @@ namespace LibApp
                 options.AddPolicy("RequireOwnerRole", policy => policy.RequireRole("Owner"));
                 options.AddPolicy("RequireManagerRole", policy => policy.RequireRole("Owner", "StoreManager"));
                 options.AddPolicy("RequireUserRole", policy => policy.RequireRole("Owner", "StoreManager", "User"));
+                options.DefaultPolicy = options.GetPolicy("RequireOwnerRole");
             });
 
             services.AddRepositories();

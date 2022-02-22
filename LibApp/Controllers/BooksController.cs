@@ -2,6 +2,7 @@
 using LibApp.Domain.Dtos.Book;
 using LibApp.Services.Interfaces;
 using LibApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -20,9 +21,11 @@ namespace LibApp.Controllers
             this.mapper = mapper;
         }
 
+        [Authorize(Policy = "RequireUserRole")]
         public IActionResult Index()
             => View();
 
+        [Authorize(Policy = "RequireUserRole")]
         public async Task<IActionResult> Details(int id)
         {
             var book = await bookService.GetBookDetails(id);
@@ -33,6 +36,7 @@ namespace LibApp.Controllers
             return View(book);
         }
 
+        [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> Edit(int id)
         {
             var book = await bookService.GetBookDetails(id);
@@ -49,6 +53,8 @@ namespace LibApp.Controllers
             return View("BookForm", viewModel);
         }
 
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> New()
         {
             var viewModel = new BookFormViewModel
@@ -59,8 +65,8 @@ namespace LibApp.Controllers
             return View("BookForm", viewModel);
         }
 
-        [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> Save(UpdateBookDto book)
         {
             if (ModelState.IsValid == false)

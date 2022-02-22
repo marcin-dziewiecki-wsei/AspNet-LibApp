@@ -1,4 +1,5 @@
 ﻿using LibApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ namespace LibApp.Controllers
             _memoryCache = memoryCache;
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
         {
             DateTime currentTime;
@@ -38,11 +40,13 @@ namespace LibApp.Controllers
             return View(currentTime);
         }
 
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -1,6 +1,7 @@
 ﻿using LibApp.Data.Repository.Interfaces;
 using LibApp.Domain.Dtos;
 using LibApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace LibApp.Controllers.Api
         }
 
         [HttpPost]
+        [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> CreateNewRental([FromBody] NewRentalDto newRental)
         {
             var customer = await customerRepository.GetByIdWithMemberTypeAsync(newRental.CustomerId);

@@ -2,6 +2,7 @@
 using LibApp.Data.Repository.Interfaces;
 using LibApp.Domain.Dtos;
 using LibApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace LibApp.Controllers.Api
 
         // GET /api/customers
         [HttpGet]
+        [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> GetCustomers(string query = null)
         {
             var customers = await customerRepository.GetAllFilteredByNameWithMembershipTypesAsync(query);
@@ -33,6 +35,7 @@ namespace LibApp.Controllers.Api
 
         // GET /api/customers/{id}
         [HttpGet("{id}")]
+        [Authorize(Policy = "RequireManagerRole")]
         public async Task<IActionResult> GetCustomer(int id)
         {
             var customer = await customerRepository.GetByIdAsync(id);
@@ -47,6 +50,7 @@ namespace LibApp.Controllers.Api
 
         // POST /api/customers/
         [HttpPost]
+        [Authorize(Policy = "RequireOwnerRole")]
         public async Task<IActionResult> CreateCustomer(CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
@@ -61,6 +65,7 @@ namespace LibApp.Controllers.Api
 
         // PUT api/customers/{id}
         [HttpPut("{id}")]
+        [Authorize(Policy = "RequireOwnerRole")]
         public async Task<IActionResult> UpdateCustomer(int id, CustomerDto customerDto)
         {
             customerDto.Id = id;
@@ -78,6 +83,7 @@ namespace LibApp.Controllers.Api
 
         // DELETE /api/customers
         [HttpDelete("{id}")]
+        [Authorize(Policy = "RequireOwnerRole")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             if (await customerRepository.DeleteByIdAsync(id))
