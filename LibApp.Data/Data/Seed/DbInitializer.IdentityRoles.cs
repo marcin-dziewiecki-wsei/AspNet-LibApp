@@ -18,9 +18,9 @@ namespace LibApp.Data.Data.Seed
 
             var collectionToAdd = new List<IdentityRole>
             {
-                new IdentityRole("User"),
+                new IdentityRole("Owner"),
                 new IdentityRole("StoreManager"),
-                new IdentityRole("Owner")
+                new IdentityRole("User")
             };
 
             foreach (var role in collectionToAdd)

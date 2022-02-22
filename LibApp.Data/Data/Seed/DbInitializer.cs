@@ -33,6 +33,7 @@ namespace LibApp.Data.Data.Seed
 
 
                 var identityRoles = await SeedIdentityRoles(scope);
+                var identityUsers = await SeedIdentityUsers(scope, identityRoles);
             }
             return app;
         }       
